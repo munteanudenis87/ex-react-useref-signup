@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useMemo, useState, useRef } from "react"
 
   const letters = "abcdefghijklmnopqrstuvwxyz";
   const numbers = "0123456789";
@@ -6,12 +6,13 @@ import { useMemo, useState } from "react"
 
 function App() {
 
-  const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [specializzazione, setSpecializzazione] = useState('');
-  const [esperienza, setEsperienza] = useState('');
   const [descrizione, setDescrizione] = useState('');
+
+  const nomeRef = useRef();
+  const specializzazioneRef = useRef();
+  const esperienzaRef = useRef();
 
   const isUsernameValid = useMemo(() => {
     const chars = username.split("").every(char => letters.includes(char.toLowerCase()) || numbers.includes(char));
@@ -36,19 +37,28 @@ function App() {
 
   const handleSubmit = event => {
     event.preventDefault();
+
+    //  Valori non controllati
+    const nome = nomeRef.current.value;
+    const specializzazione = specializzazioneRef.current.value;
+    const esperienza = esperienzaRef.current.value;
+
     if(
-      !name.trim() ||
+      !nome.trim() ||
       !username.trim() ||
       !password.trim() ||
       !specializzazione.trim() ||
       !esperienza.trim() ||
       esperienza <= 0 ||
-      !descrizione
+      !descrizione ||
+      !isDescrizioneValid ||
+      !isPasswordValid ||
+      !isUsernameValid
     ){
       alert("Errore: Compilare tutti i campi.");
       return;
     }
-    console.log({name, username, password, specializzazione, esperienza, descrizione})
+    console.log({nome, username, password, specializzazione, esperienza, descrizione})
   }
 
   return (
@@ -59,8 +69,7 @@ function App() {
           <p>Nome Completo</p>
           <input
             type="text"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
+            ref={nomeRef}
           />
         </label>
         <label>
@@ -88,10 +97,9 @@ function App() {
         <label>
           <p>Specializzazione</p>
           <select
-            value={specializzazione}
-            onChange={event => setSpecializzazione(event.target.value)}
+            ref={specializzazioneRef}
           >
-            <option value="Specializzazione">Seleziona Specializzazione</option>
+            <option value="">Seleziona Specializzazione</option>
             <option value="Full Stack">Full Stack</option>
             <option value="Frontend">Frontend</option>
             <option value="Backend">Backend</option>
@@ -101,8 +109,7 @@ function App() {
           <p>Anni di esperienza</p>
           <input
             type="number"
-            value={esperienza}
-            onChange={(event) => setEsperienza(event.target.value)}
+            ref={esperienzaRef}
           />
         </label>
         <label>
@@ -162,3 +169,12 @@ export default App
 
 //  Per ciascuno dei campi validati in tempo reale, mostrare un messaggio di errore (rosso) nel caso non siano validi, 
 // oppure un messaggio di conferma (verde) nel caso siano validi.
+
+//  Milestone 3: Convertire i Campi Non Controllati
+//  Non tutti i campi del form necessitano di essere aggiornati a ogni carattere digitato. 
+// Alcuni di essi non influenzano direttamente l’interfaccia mentre l’utente li compila, quindi è possibile gestirli in modo più efficiente.
+
+//  Analizza il form: Identifica quali campi devono rimanere controllati e quali invece possono essere non controllati senza impattare l’esperienza utente.
+//  Converti i campi non controllati: Usa useRef() per gestirli e recuperare il loro valore solo al momento del submit.
+//  Assicurati che la validazione continui a funzionare: Anche se un campo non è controllato, 
+// deve comunque essere validato correttamente quando l’utente invia il form.
