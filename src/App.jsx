@@ -1,4 +1,8 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
+
+  const letters = "abcdefghijklmnopqrstuvwxyz";
+  const numbers = "0123456789";
+  const symbols = "!@#$%^&*()-_=+[]{}|;:'\",.<>?/`~";
 
 function App() {
 
@@ -8,6 +12,27 @@ function App() {
   const [specializzazione, setSpecializzazione] = useState('');
   const [esperienza, setEsperienza] = useState('');
   const [descrizione, setDescrizione] = useState('');
+
+  const isUsernameValid = useMemo(() => {
+    const chars = username.split("").every(char => letters.includes(char.toLowerCase()) || numbers.includes(char));
+    return chars && username.length >= 6;
+  }, [username]);
+
+  const isPasswordValid = useMemo(() => {
+    return (
+      password.length >= 8 &&
+      password.split("").some(char => letters.includes(char)) &&
+      password.split("").some(char => numbers.includes(char)) &&
+      password.split("").some(char => symbols.includes(char))
+    );
+  }, [password])
+
+  const isDescrizioneValid = useMemo (() => {
+    return (
+      descrizione.trim().length >= 100 &&
+      descrizione.trim().length < 1000
+    );
+  }, [descrizione])
 
   const handleSubmit = event => {
     event.preventDefault();
@@ -45,6 +70,9 @@ function App() {
             value={username}
             onChange={(event) => setUsername(event.target.value)}
           />
+          {username.trim() && (
+            <p style={{ color: isUsernameValid ? 'green' : 'red'}}>{isUsernameValid ? "Username valido" : "Deve contenere almeno 6 caractteri"}</p>
+          )}
         </label>
         <label>
           <p>Password</p>
@@ -53,6 +81,9 @@ function App() {
             value={password}
             onChange={(event) => setPassword(event.target.value)}
           />
+          {password.trim() && (
+            <p style={{ color: isPasswordValid ? 'green' : 'red'}}>{isPasswordValid ? "Username valido" : "Deve contenere almeno 8 caratteri, 1 lettera, 1 numero e 1 simbolo"}</p>
+          )}
         </label>
         <label>
           <p>Specializzazione</p>
@@ -80,6 +111,9 @@ function App() {
             value={descrizione}
             onChange={event => setDescrizione(event.target.value)}
           />
+          {descrizione.trim() && (
+            <p style={{ color: isDescrizioneValid ? 'green' : 'red'}}>{isDescrizioneValid ? "Username valido" : `Deve contenere tra 100 e 1000 caratteri (${descrizione.trim().length})`}</p>
+          )}
         </label>
       <button type="submit">Registrati</button>
       </form>
@@ -112,3 +146,19 @@ export default App
 //  La Specializzazione sia selezionata
 
 //  Al submit, se il form è valido, stampa in console i dati.
+
+//   Milestone 2: Validare in tempo reale
+//  Aggiungere la validazione in tempo reale dei seguenti campi:
+
+//  ✅ Username: Deve contenere solo caratteri alfanumerici e almeno 6 caratteri (no spazi o simboli).
+
+//  ✅ Password: Deve contenere almeno 8 caratteri, 1 lettera, 1 numero e 1 simbolo.
+
+//  ✅ Descrizione: Deve contenere tra 100 e 1000 caratteri (senza spazi iniziali e finali).
+
+//  Suggerimento: Per semplificare la validazione, puoi definire tre stringhe con i caratteri validi e usare .includes() 
+// per controllare se i caratteri appartengono a una di queste categorie:
+
+
+//  Per ciascuno dei campi validati in tempo reale, mostrare un messaggio di errore (rosso) nel caso non siano validi, 
+// oppure un messaggio di conferma (verde) nel caso siano validi.
